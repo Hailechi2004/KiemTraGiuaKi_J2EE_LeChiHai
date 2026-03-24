@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Biểu mẫu bác sĩ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main class="container" style="max-width: 860px; padding-top: 28px">
+      <section class="panel">
+        <h1
+          th:text="${course.id == null ? 'Tạo bác sĩ mới' : 'Chỉnh sửa bác sĩ'}"
+        ></h1>
+
+        <form
+          th:action="${course.id == null} ? @{/admin/courses/create} : @{'/admin/courses/edit/' + ${course.id}}"
+          th:object="${course}"
+          method="post"
+          class="form-grid"
+          style="margin-top: 14px"
+        >
+          <input
+            type="hidden"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}"
+          />
+          <div class="full">
+            <label>Tên bác sĩ</label>
+            <input
+              class="input"
+              type="text"
+              th:field="*{name}"
+              placeholder="Nhập tên bác sĩ"
+            />
+          </div>
+
+          <div>
+            <label>Năm kinh nghiệm</label>
+            <input
+              class="input"
+              type="number"
+              min="0"
+              th:field="*{experienceYears}"
+            />
+          </div>
+
+          <div>
+            <label>Chuyên khoa</label>
+            <input
+              class="input"
+              type="text"
+              th:field="*{specialty}"
+              placeholder="Nhập chuyên khoa"
+            />
+          </div>
+
+          <div class="full">
+            <label>URL hình ảnh</label>
+            <input
+              class="input"
+              type="text"
+              th:field="*{image}"
+              placeholder="https://..."
+            />
+          </div>
+
+          <div class="full">
+            <label>Danh mục</label>
+            <select class="select" name="categoryId">
+              <option
+                th:each="c : ${categories}"
+                th:value="${c.id}"
+                th:text="${c.name}"
+                th:selected="${course.category != null and c.id == course.category.id}"
+              ></option>
+            </select>
+          </div>
+
+          <div class="full actions">
+            <button class="btn btn-primary" type="submit">Lưu</button>
+            <a class="btn btn-accent" href="/admin/courses">Quay lại</a>
+          </div>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký tài khoản bệnh nhân</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main class="auth-shell">
+      <section class="panel auth-panel">
+        <div class="auth-card">
+          <div class="auth-visual">
+            <div>
+              <span class="auth-tag">Tạo tài khoản mới</span>
+              <h2>Đăng ký nhanh để đặt lịch khám</h2>
+              <p>
+                Mỗi tài khoản đăng ký mới sẽ được gán quyền PATIENT để có thể
+                đặt lịch khám và theo dõi lịch sử khám bệnh của mình.
+              </p>
+            </div>
+            <ul class="auth-list">
+              <li>Chọn tên đăng nhập dễ nhớ</li>
+              <li>Mật khẩu tối thiểu 6 ký tự</li>
+              <li>Email dùng để đăng nhập Google và nhận thông báo</li>
+            </ul>
+          </div>
+
+          <div class="auth-form-wrap">
+            <h1>Đăng ký</h1>
+            <p class="meta">Tạo tài khoản Bệnh nhân mới</p>
+
+            <div
+              class="alert alert-danger"
+              th:if="${errorMessage}"
+              th:text="${errorMessage}"
+            ></div>
+
+            <form
+              th:action="@{/auth/register}"
+              th:object="${registerRequest}"
+              method="post"
+              style="display: grid; gap: 12px; margin-top: 10px"
+            >
+              <input
+                type="hidden"
+                th:name="${_csrf.parameterName}"
+                th:value="${_csrf.token}"
+              />
+              <div>
+                <input
+                  class="input"
+                  type="text"
+                  th:field="*{username}"
+                  placeholder="Tên đăng nhập"
+                />
+                <small
+                  class="meta"
+                  th:if="${#fields.hasErrors('username')}"
+                  th:errors="*{username}"
+                ></small>
+              </div>
+              <div>
+                <input
+                  class="input"
+                  type="password"
+                  th:field="*{password}"
+                  placeholder="Mật khẩu"
+                />
+                <small
+                  class="meta"
+                  th:if="${#fields.hasErrors('password')}"
+                  th:errors="*{password}"
+                ></small>
+              </div>
+              <div>
+                <input
+                  class="input"
+                  type="email"
+                  th:field="*{email}"
+                  placeholder="Email"
+                />
+                <small
+                  class="meta"
+                  th:if="${#fields.hasErrors('email')}"
+                  th:errors="*{email}"
+                ></small>
+              </div>
+              <button class="btn btn-primary" type="submit">Đăng ký</button>
+            </form>
+
+            <p class="meta" style="margin-top: 12px">
+              Đã có tài khoản?
+              <a
+                href="/auth/login"
+                style="color: var(--primary); font-weight: 700"
+                >Đăng nhập</a
+              >
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lịch khám của tôi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a href="/home" class="brand">Lịch khám của tôi</a>
+        <nav class="nav-links">
+          <a class="nav-link" href="/home">Trang chủ</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="panel">
+        <h1>Các lịch khám đã đặt</h1>
+        <p class="meta">
+          Bệnh nhân: <strong th:text="${currentUsername}"></strong>
+        </p>
+
+        <div class="table-wrap" th:if="${!#lists.isEmpty(enrollments)}">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Bác sĩ</th>
+                <th>Năm kinh nghiệm</th>
+                <th>Chuyên khoa</th>
+                <th>Ngày khám</th>
+                <th>Chi tiết</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="enrollment : ${enrollments}">
+                <td th:text="${enrollment.course.name}"></td>
+                <td th:text="${enrollment.course.experienceYears}"></td>
+                <td th:text="${enrollment.course.specialty}"></td>
+                <td
+                  th:text="${#temporals.format(enrollment.appointmentDate, 'dd/MM/yyyy HH:mm')}"
+                ></td>
+                <td>
+                  <a
+                    class="btn btn-primary"
+                    th:href="@{'/courses/' + ${enrollment.course.id}}"
+                    >Xem</a
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="alert alert-danger" th:if="${#lists.isEmpty(enrollments)}">
+          Bạn chưa đặt lịch khám nào. Hãy vào Trang chủ để đặt lịch.
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

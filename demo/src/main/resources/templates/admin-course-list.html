@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Quản lý bác sĩ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a href="/home" class="brand">Bảng điều khiển Admin</a>
+        <nav class="nav-links">
+          <a class="nav-link" href="/home">Trang chủ</a>
+          <a class="nav-link" href="/admin/courses/create">Thêm bác sĩ</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="panel">
+        <h1>CRUD bác sĩ cho ADMIN</h1>
+        <div class="alert alert-success" th:if="${param.created}">
+          Tạo bác sĩ thành công.
+        </div>
+        <div class="alert alert-success" th:if="${param.updated}">
+          Cập nhật bác sĩ thành công.
+        </div>
+        <div class="alert alert-success" th:if="${param.deleted}">
+          Xóa bác sĩ thành công.
+        </div>
+
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên bác sĩ</th>
+                <th>Năm kinh nghiệm</th>
+                <th>Chuyên khoa</th>
+                <th>Danh mục</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="course : ${courses}">
+                <td th:text="${course.id}"></td>
+                <td th:text="${course.name}"></td>
+                <td th:text="${course.experienceYears}"></td>
+                <td th:text="${course.specialty}"></td>
+                <td
+                  th:text="${course.category != null ? course.category.name : 'Tổng hợp'}"
+                ></td>
+                <td>
+                  <a
+                    class="btn btn-primary"
+                    th:href="@{'/admin/courses/edit/' + ${course.id}}"
+                    >Sửa</a
+                  >
+                  <form
+                    th:action="@{'/admin/courses/delete/' + ${course.id}}"
+                    method="post"
+                    style="display: inline-block"
+                  >
+                    <input
+                      type="hidden"
+                      th:name="${_csrf.parameterName}"
+                      th:value="${_csrf.token}"
+                    />
+                    <button
+                      class="btn btn-danger"
+                      type="submit"
+                      onclick="
+                        return confirm('Bạn chắc chắn muốn xóa bác sĩ này?');
+                      "
+                    >
+                      Xóa
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

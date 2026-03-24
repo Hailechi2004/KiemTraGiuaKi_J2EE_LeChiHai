@@ -1,0 +1,98 @@
+<!doctype html>
+<html
+  lang="vi"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi tiết bác sĩ</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a href="/home" class="brand">Clinic Appointment</a>
+        <nav class="nav-links">
+          <a class="nav-link" href="/home">Trang chủ</a>
+          <a
+            class="nav-link"
+            href="/enroll/my-courses"
+            sec:authorize="hasRole('PATIENT')"
+            >Lịch khám của tôi</a
+          >
+          <a
+            class="nav-link"
+            href="/admin/courses"
+            sec:authorize="hasRole('ADMIN')"
+            >Admin</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="panel">
+        <div class="detail-layout">
+          <img
+            class="card-image"
+            th:src="${course.image != null and !#strings.isEmpty(course.image) ? course.image : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200'}"
+            alt="Hình minh họa bác sĩ"
+          />
+
+          <div>
+            <span
+              class="badge"
+              th:text="${course.category != null ? course.category.name : 'Tổng hợp'}"
+            ></span>
+            <h1 th:text="${course.name}" style="margin: 8px 0 10px"></h1>
+            <p class="meta">Thông tin chi tiết bác sĩ.</p>
+
+            <div class="detail-meta-grid">
+              <div class="meta-box">
+                <span class="label">Năm kinh nghiệm</span>
+                <span class="value" th:text="${course.experienceYears}"></span>
+              </div>
+              <div class="meta-box">
+                <span class="label">Chuyên khoa</span>
+                <span class="value" th:text="${course.specialty}"></span>
+              </div>
+            </div>
+
+            <div class="actions" style="margin-top: 18px">
+              <a class="btn btn-primary" href="/home">Quay lại trang chủ</a>
+              <form
+                th:if="${!enrolled}"
+                th:action="@{'/enroll/' + ${course.id}}"
+                method="post"
+                sec:authorize="hasRole('PATIENT')"
+              >
+                <input
+                  type="hidden"
+                  th:name="${_csrf.parameterName}"
+                  th:value="${_csrf.token}"
+                />
+                <button class="btn btn-accent" type="submit">
+                  Đặt lịch khám
+                </button>
+              </form>
+              <span
+                class="enrolled-note"
+                th:if="${enrolled}"
+                sec:authorize="hasRole('PATIENT')"
+                >Đã đặt lịch</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

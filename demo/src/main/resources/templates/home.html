@@ -1,0 +1,195 @@
+<!doctype html>
+<html
+  lang="vi"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hệ thống Đặt lịch Khám Bệnh viện</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a href="/home" class="brand">Clinic Appointment</a>
+        <form class="search-form" th:action="@{/home}" method="get">
+          <input
+            type="text"
+            name="keyword"
+            class="input"
+            placeholder="Tìm kiếm bác sĩ theo tên..."
+            th:value="${keyword}"
+          />
+          <button class="btn btn-accent" type="submit">Tìm</button>
+        </form>
+        <nav class="nav-links">
+          <a class="nav-link" href="/home">Trang chủ</a>
+          <a class="nav-link" href="/courses">Bác sĩ</a>
+          <a
+            class="nav-link"
+            href="/enroll/my-courses"
+            sec:authorize="hasRole('PATIENT')"
+            >Lịch khám của tôi</a
+          >
+          <a
+            class="nav-link"
+            href="/admin/courses"
+            sec:authorize="hasRole('ADMIN')"
+            >Admin</a
+          >
+          <a
+            class="nav-link"
+            href="/auth/login"
+            sec:authorize="!isAuthenticated()"
+            >Đăng nhập</a
+          >
+          <a
+            class="nav-link"
+            href="/auth/register"
+            sec:authorize="!isAuthenticated()"
+            >Đăng ký</a
+          >
+          <form
+            th:action="@{/logout}"
+            method="post"
+            sec:authorize="isAuthenticated()"
+          >
+            <input
+              type="hidden"
+              th:name="${_csrf.parameterName}"
+              th:value="${_csrf.token}"
+            />
+            <button class="btn btn-primary" type="submit">Đăng xuất</button>
+          </form>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <h1>Danh sách bác sĩ & lịch khám</h1>
+        <p>
+          Khám bệnh nhanh chóng: xem danh sách bác sĩ, chuyên khoa, khoa và đặt
+          lịch khám. Mỗi trang hiển thị 5 bác sĩ.
+        </p>
+        <div class="hero-strip">
+          <span class="hero-chip">Phân trang 5 bác sĩ</span>
+          <span class="hero-chip">Tìm kiếm theo tên bác sĩ</span>
+          <span class="hero-chip">Đặt lịch khám ngay</span>
+        </div>
+        <div class="alert alert-success" th:if="${param.booked}">
+          Đặt lịch khám thành công.
+        </div>
+        <div class="alert alert-danger" th:if="${param.duplicate}">
+          Lịch khám đã tồn tại với bác sĩ này.
+        </div>
+        <div class="alert alert-danger" th:if="${param.dateMissing}">
+          Vui lòng chọn ngày khám.
+        </div>
+        <div class="alert alert-danger" th:if="${param.invalidDate}">
+          Ngày khám không hợp lệ.
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card" th:each="course : ${courses.content}">
+          <img
+            class="card-image"
+            th:src="${course.image != null and !#strings.isEmpty(course.image) ? course.image : 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=1200'}"
+            alt="Hình ảnh bác sĩ"
+          />
+          <div class="card-body">
+            <span
+              class="badge"
+              th:text="${course.category != null ? course.category.name : 'Tổng hợp'}"
+            ></span>
+            <h3 th:text="${course.name}"></h3>
+            <div class="meta">
+              Chuyên khoa: <strong th:text="${course.specialty}"></strong>
+            </div>
+            <div class="meta">
+              Năm kinh nghiệm:
+              <strong th:text="${course.experienceYears}"></strong>
+            </div>
+            <div
+              class="actions"
+              style="flex-direction: column; align-items: flex-start; gap: 8px"
+            >
+              <a class="btn btn-primary" th:href="@{'/courses/' + ${course.id}}"
+                >Xem chi tiết</a
+              >
+              <form
+                th:if="${!enrolledCourseIds.contains(course.id)}"
+                th:action="@{'/enroll/' + ${course.id}}"
+                method="post"
+                sec:authorize="hasRole('PATIENT')"
+                style="
+                  width: 100%;
+                  display: flex;
+                  gap: 8px;
+                  align-items: center;
+                  flex-wrap: wrap;
+                "
+              >
+                <input
+                  type="hidden"
+                  th:name="${_csrf.parameterName}"
+                  th:value="${_csrf.token}"
+                />
+                <input
+                  class="input"
+                  type="date"
+                  name="appointmentDate"
+                  min="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
+                  required
+                  style="max-width: 160px"
+                />
+                <button class="btn btn-accent" type="submit">Đặt lịch</button>
+              </form>
+              <span
+                class="enrolled-note"
+                th:if="${enrolledCourseIds.contains(course.id)}"
+                sec:authorize="hasRole('PATIENT')"
+                >Đã đặt lịch</span
+              >
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="pagination" th:if="${courses.totalPages > 1}">
+        <a
+          class="page-link"
+          th:if="${!courses.first}"
+          th:href="@{/home(page=${courses.number - 1}, keyword=${keyword})}"
+          >Trước</a
+        >
+
+        <a
+          class="page-link"
+          th:each="i : ${#numbers.sequence(0, courses.totalPages - 1)}"
+          th:classappend="${i == courses.number ? 'active' : ''}"
+          th:href="@{/home(page=${i}, keyword=${keyword})}"
+          th:text="${i + 1}"
+        ></a>
+
+        <a
+          class="page-link"
+          th:if="${!courses.last}"
+          th:href="@{/home(page=${courses.number + 1}, keyword=${keyword})}"
+          >Sau</a
+        >
+      </section>
+    </main>
+
+    <footer class="footer">Hệ thống đặt lịch khám bệnh - Spring Boot</footer>
+  </body>
+</html>
